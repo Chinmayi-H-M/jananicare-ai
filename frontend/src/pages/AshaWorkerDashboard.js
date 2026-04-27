@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { acknowledgeAlert } from '../firebase/firestoreService';
 import Navbar from '../components/Navbar';
 import './AshaWorkerDashboard.css';
@@ -20,22 +22,29 @@ const AshaWorkerDashboard = () => {
 
   const fetchDashboard = async () => {
     try {
-      // Fetch real data from backend (Firebase Admin SDK)
-      const [mothersRes, alertsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/admin/mothers'),
-        fetch('http://localhost:5000/api/admin/alerts')
-      ]);
-      const { mothers } = await mothersRes.json();
-      const { alerts } = await alertsRes.json();
+      // Read mothers directly from Firebase Firestore
+      const mothersSnap = await getDocs(collection(db, 'motherProfiles'));
+      const mothers = mothersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Read pending alerts
+      let alerts = [];
+      try {
+        const alertsSnap = await getDocs(
+          query(collection(db, 'alerts'), where('status', '==', 'pending'))
+        );
+        alerts = alertsSnap.docs.map(doc => ({ _id: doc.id, id: doc.id, ...doc.data() }));
+      } catch (e) {
+        console.log('Alerts query needs index, skipping:', e.message);
+      }
 
       const riskOrder = { high: 0, medium: 1, low: 2, unknown: 3 };
-      const patients = (mothers || [])
+      const patients = mothers
         .map(m => ({
           id: m.userId || m.id,
-          name: m.name,
-          phone: m.phone,
-          village: m.village,
-          district: m.district,
+          name: m.name || 'Unknown',
+          phone: m.phone || '',
+          village: m.village || '',
+          district: m.district || '',
           riskLevel: m.currentRiskLevel || 'unknown',
           currentTrimester: m.currentTrimester,
           latestRiskScore: m.latestRiskScore,
@@ -49,11 +58,11 @@ const AshaWorkerDashboard = () => {
         highRisk: patients.filter(p => p.riskLevel === 'high').length,
         mediumRisk: patients.filter(p => p.riskLevel === 'medium').length,
         lowRisk: patients.filter(p => p.riskLevel === 'low').length,
-        pendingAlerts: (alerts || []).length,
-        criticalAlerts: (alerts || []).filter(a => a.severity === 'critical').length
+        pendingAlerts: alerts.length,
+        criticalAlerts: alerts.filter(a => a.severity === 'critical').length
       };
 
-      setData({ patients, pendingAlerts: alerts || [], stats });
+      setData({ patients, pendingAlerts: alerts, stats });
     } catch (err) {
       console.error('Dashboard fetch error:', err);
       setData({ patients: [], pendingAlerts: [], stats: { total: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0, pendingAlerts: 0, criticalAlerts: 0 } });
