@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getMotherDashboard } from '../firebase/firestoreService';
-import { saveAlert } from '../firebase/firestoreService';
+import { useLanguage } from '../context/LanguageContext';
+import { getMotherDashboard, saveAlert } from '../services/dataService';
 import Navbar from '../components/Navbar';
 import './MotherDashboard.css';
 
 const MotherDashboard = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [dashData, setDashData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,8 +73,8 @@ const MotherDashboard = () => {
         {/* Welcome Header */}
         <div className="dashboard-header fade-in">
           <div>
-            <h1>Hello, {user?.name?.split(' ')[0]} 🌸</h1>
-            <p>Here's your pregnancy health overview for today</p>
+            <h1>{t('hello')}, {user?.name?.split(' ')[0]} 🌸</h1>
+            <p>{t('healthOverview')}</p>
           </div>
           <div className="header-date">
             <span>{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -85,8 +86,8 @@ const MotherDashboard = () => {
           <div className="alert-success fade-in">
             <span>✅</span>
             <div>
-              <strong>Emergency Alert Sent!</strong>
-              <p>Your ASHA worker and nearest PHC have been notified. Help is on the way!</p>
+              <strong>{t('emergencyAlertSent')}</strong>
+              <p>{t('helpOnWay')}</p>
             </div>
           </div>
         ) : (
@@ -94,12 +95,12 @@ const MotherDashboard = () => {
             <div className="one-tap-info">
               <span className="one-tap-icon">🆘</span>
               <div>
-                <strong>One Tap Emergency Help</strong>
-                <p>Instantly alert your ASHA worker and nearest PHC</p>
+                <strong>{t('oneTapHelp')}</strong>
+                <p>{t('alertASHA')}</p>
               </div>
             </div>
             <button className="one-tap-btn" onClick={handleOneTapHelp} disabled={sendingAlert}>
-              {sendingAlert ? '⏳ Sending...' : '🆘 SEND HELP NOW'}
+              {sendingAlert ? '⏳ ...' : `🆘 ${t('sendHelpNow')}`}
             </button>
           </div>
         )}
@@ -110,8 +111,8 @@ const MotherDashboard = () => {
           <div className={`risk-card risk-${riskLevel} fade-in`}>
             <div className="risk-card-header">
               <div>
-                <h3>Pregnancy Risk Status</h3>
-                <p>Based on your latest health assessment</p>
+                <h3>{t('pregnancyRisk')}</h3>
+                <p>{t('basedOnAssessment')}</p>
               </div>
               <div className={`risk-badge-large risk-badge-${riskLevel}`}>
                 {riskLevel === 'high' ? '🔴' : riskLevel === 'medium' ? '🟡' : riskLevel === 'low' ? '🟢' : '⚪'}
@@ -122,7 +123,7 @@ const MotherDashboard = () => {
               <>
                 <div className="risk-score-bar">
                   <div className="risk-score-label">
-                    <span>Risk Score</span>
+                    <span>{t('riskScore')}</span>
                     <span className="risk-score-num">{latestPrediction.riskScore}/100</span>
                   </div>
                   <div className="risk-bar-track">
@@ -133,47 +134,47 @@ const MotherDashboard = () => {
                   </div>
                 </div>
                 <p className="risk-urgency">
-                  {riskLevel === 'high' ? '🚨 Seek immediate medical attention' :
-                   riskLevel === 'medium' ? '⚠️ Schedule doctor visit within 2-3 days' :
-                   '✅ Continue regular antenatal checkups'}
+                  {riskLevel === 'high' ? `🚨 ${t('seekImmediate')}` :
+                   riskLevel === 'medium' ? `⚠️ ${t('scheduleDoctorVisit')}` :
+                   `✅ ${t('continueCheckups')}`}
                 </p>
               </>
             ) : (
               <div className="no-prediction">
-                <p>No risk assessment yet</p>
+                <p>{t('noAssessmentYet')}</p>
                 <button className="assess-btn" onClick={() => navigate('/health-form')}>
-                  Start Health Assessment →
+                  {t('startAssessment')} →
                 </button>
               </div>
             )}
             <button className="update-btn" onClick={() => navigate('/health-form')}>
-              📋 Update Health Data
+              📋 {t('updateHealthData')}
             </button>
           </div>
 
           {/* Next Checkup */}
           <div className="info-card fade-in">
             <div className="info-card-icon">📅</div>
-            <h3>Next Checkup</h3>
+            <h3>{t('nextCheckup')}</h3>
             {nextCheckup ? (
               <>
                 <p className="info-card-value">{new Date(nextCheckup).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 <p className="info-card-sub">
-                  {Math.ceil((new Date(nextCheckup) - new Date()) / (1000 * 60 * 60 * 24))} days remaining
+                  {Math.ceil((new Date(nextCheckup) - new Date()) / (1000 * 60 * 60 * 24))} {t('daysRemaining')}
                 </p>
               </>
             ) : (
               <p className="info-card-value">Schedule your next visit</p>
             )}
-            <div className="info-card-badge">Antenatal Visit</div>
+            <div className="info-card-badge">{t('antenatalVisit')}</div>
           </div>
 
           {/* Trimester Info */}
           <div className="info-card fade-in">
             <div className="info-card-icon">🤰</div>
-            <h3>Pregnancy Stage</h3>
+            <h3>{t('pregnancyStage')}</h3>
             <p className="info-card-value">
-              {profile?.currentTrimester ? `Trimester ${profile.currentTrimester}` : 'Not set'}
+              {profile?.currentTrimester ? `${t('trimester')} ${profile.currentTrimester}` : t('notSet')}
             </p>
             <p className="info-card-sub">
               {profile?.currentTrimester === 1 ? 'Weeks 1-12' :
@@ -191,8 +192,8 @@ const MotherDashboard = () => {
         {/* Medicine Reminders */}
         <div className="section-card fade-in">
           <div className="section-card-header">
-            <h2>💊 Medicine & Supplement Reminders</h2>
-            <span className="section-badge">Today</span>
+            <h2>💊 {t('medicineReminders')}</h2>
+            <span className="section-badge">{t('today')}</span>
           </div>
           <div className="reminders-grid">
             {(medicineReminders || []).map((rem, i) => (
@@ -211,9 +212,9 @@ const MotherDashboard = () => {
         {/* Nutrition Tips */}
         <div className="section-card fade-in">
           <div className="section-card-header">
-            <h2>🥗 Nutrition Guidance</h2>
+            <h2>🥗 {t('nutritionGuidance')}</h2>
             <span className="section-badge">
-              {profile?.currentTrimester ? `Trimester ${profile.currentTrimester}` : 'General'}
+              {profile?.currentTrimester ? `${t('trimester')} ${profile.currentTrimester}` : t('general')}
             </span>
           </div>
           <div className="nutrition-grid">
@@ -232,7 +233,7 @@ const MotherDashboard = () => {
         {/* Health Tips */}
         <div className="section-card fade-in">
           <div className="section-card-header">
-            <h2>💡 Personalized Health Tips</h2>
+            <h2>💡 {t('healthTips')}</h2>
             <span className={`section-badge badge-${riskLevel}`}>
               {riskLevel.toUpperCase()} RISK
             </span>
@@ -250,32 +251,32 @@ const MotherDashboard = () => {
         {/* Emergency Contact */}
         <div className="section-card emergency-contact-card fade-in">
           <div className="section-card-header">
-            <h2>📞 Emergency Contacts</h2>
+            <h2>📞 {t('emergencyContacts')}</h2>
           </div>
           <div className="contacts-grid">
             <div className="contact-item">
               <div className="contact-icon">🏥</div>
               <div>
-                <strong>National Ambulance</strong>
+                <strong>{t('nationalAmbulance')}</strong>
                 <span className="contact-number">108</span>
               </div>
-              <a href="tel:108" className="call-btn">Call</a>
+              <a href="tel:108" className="call-btn">{t('call')}</a>
             </div>
             <div className="contact-item">
               <div className="contact-icon">👩‍⚕️</div>
               <div>
-                <strong>Women Helpline</strong>
+                <strong>{t('womenHelpline')}</strong>
                 <span className="contact-number">181</span>
               </div>
-              <a href="tel:181" className="call-btn">Call</a>
+              <a href="tel:181" className="call-btn">{t('call')}</a>
             </div>
             <div className="contact-item">
               <div className="contact-icon">🚑</div>
               <div>
-                <strong>Emergency Services</strong>
+                <strong>{t('emergencyServices')}</strong>
                 <span className="contact-number">112</span>
               </div>
-              <a href="tel:112" className="call-btn">Call</a>
+              <a href="tel:112" className="call-btn">{t('call')}</a>
             </div>
             {dashData?.emergencyContact?.phone && (
               <div className="contact-item">
@@ -294,11 +295,11 @@ const MotherDashboard = () => {
         <div className="cta-card fade-in">
           <div className="cta-content">
             <div>
-              <h3>Ready for your AI Risk Assessment?</h3>
-              <p>Enter your latest health data to get an updated risk prediction</p>
+              <h3>{t('readyAssessment')}</h3>
+              <p>{t('enterHealthData')}</p>
             </div>
             <button className="cta-btn" onClick={() => navigate('/health-form')}>
-              Start Assessment →
+              {t('startAssessment')} →
             </button>
           </div>
         </div>

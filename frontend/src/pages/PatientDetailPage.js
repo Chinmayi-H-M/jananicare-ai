@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/config';
-import { logVisit } from '../firebase/firestoreService';
+import { getPatientDetail, logVisit } from '../services/dataService';
 import Navbar from '../components/Navbar';
 import './PatientDetailPage.css';
 
@@ -22,36 +20,8 @@ const PatientDetailPage = () => {
 
   const fetchPatient = async () => {
     try {
-      const uid = id;
-      // Read directly from Firebase
-      const [userDoc, profileDoc] = await Promise.all([
-        getDoc(doc(db, 'users', uid)),
-        getDoc(doc(db, 'motherProfiles', uid))
-      ]);
-
-      let predictions = [];
-      try {
-        const predSnap = await getDocs(
-          query(collection(db, 'predictions'), where('userId', '==', uid), orderBy('createdAt', 'desc'), limit(10))
-        );
-        predictions = predSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e) { console.log('Predictions query:', e.message); }
-
-      let alerts = [];
-      try {
-        const alertSnap = await getDocs(
-          query(collection(db, 'alerts'), where('userId', '==', uid), orderBy('createdAt', 'desc'), limit(10))
-        );
-        alerts = alertSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e) { console.log('Alerts query:', e.message); }
-
-      setData({
-        mother: userDoc.exists() ? { uid, ...userDoc.data() } : profileDoc.exists() ? { uid, ...profileDoc.data() } : null,
-        profile: profileDoc.exists() ? profileDoc.data() : null,
-        predictions,
-        alerts,
-        healthRecords: []
-      });
+      const result = await getPatientDetail(id);
+      setData(result);
     } catch (err) {
       console.error('Patient fetch error:', err);
       setData({ mother: null, profile: null, predictions: [], alerts: [], healthRecords: [] });

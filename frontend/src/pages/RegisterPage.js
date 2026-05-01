@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import './AuthPages.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { language, switchLanguage, t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -48,16 +50,9 @@ const RegisterPage = () => {
       navigate(user.role === 'asha_worker' ? '/asha-dashboard' : '/dashboard');
     } catch (err) {
       console.error('Registration error:', err);
-      // Firebase error codes → user-friendly messages
-      const errorMessages = {
-        'auth/email-already-in-use': 'This email is already registered. Try logging in.',
-        'auth/invalid-email': 'Please enter a valid email address.',
-        'auth/weak-password': 'Password must be at least 6 characters.',
-        'auth/operation-not-allowed': 'Email/Password sign-in is not enabled. Please enable it in Firebase Console → Authentication → Sign-in method.',
-        'auth/network-request-failed': 'Network error. Check your internet connection.',
-        'auth/too-many-requests': 'Too many attempts. Please try again later.'
-      };
-      setError(errorMessages[err.code] || err.message || 'Registration failed. Please try again.');
+      // Handle API error responses
+      const errorMessage = err.response?.data?.error || err.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -68,8 +63,8 @@ const RegisterPage = () => {
       <div className="auth-left">
         <div className="auth-brand">
           <span className="brand-icon">🌸</span>
-          <h1>JananiCare AI</h1>
-          <p>Predict Early. Protect Mothers.</p>
+          <h1>{t('brandName')}</h1>
+          <p>{t('tagline')}</p>
         </div>
         <div className="register-info">
           <h3>Join JananiCare AI</h3>
@@ -87,8 +82,12 @@ const RegisterPage = () => {
       <div className="auth-right">
         <div className="auth-form-container">
           <div className="auth-form-header">
-            <h2>Create Account</h2>
-            <p>Step {step} of 2 — {step === 1 ? 'Account Details' : 'Personal Information'}</p>
+            <div className="auth-lang-switcher">
+              <button className={`lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => switchLanguage('en')}>EN</button>
+              <button className={`lang-btn ${language === 'kn' ? 'active' : ''}`} onClick={() => switchLanguage('kn')}>ಕನ್ನಡ</button>
+            </div>
+            <h2>{t('createAccount')}</h2>
+            <p>Step {step} / 2</p>
           </div>
 
           {/* Role Toggle */}
@@ -98,14 +97,14 @@ const RegisterPage = () => {
               onClick={() => setFormData({ ...formData, role: 'mother' })}
               type="button"
             >
-              🤱 Pregnant Mother
+              🤱 {t('pregnantMother')}
             </button>
             <button
               className={`role-toggle-btn ${formData.role === 'asha_worker' ? 'active' : ''}`}
               onClick={() => setFormData({ ...formData, role: 'asha_worker' })}
               type="button"
             >
-              👩‍⚕️ ASHA Worker
+              👩‍⚕️ {t('ashaWorker')}
             </button>
           </div>
 

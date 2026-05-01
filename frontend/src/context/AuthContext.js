@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../firebase/config';
-import { onAuthStateChanged } from 'firebase/auth';
-import { registerUser, loginUser, logoutUser, getUserProfile } from '../firebase/authService';
+import { registerUser, loginUser, logoutUser, getUserProfile, getCachedUser, isAuthenticated } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -10,24 +8,24 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen to Firebase auth state changes
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
+    // Restore session from localStorage on mount
+    const restoreSession = async () => {
+      if (isAuthenticated()) {
         try {
-          // Get full profile from Firestore
-          const profile = await getUserProfile(firebaseUser.uid);
+          // Try to get fresh profile from backend
+          const profile = await getUserProfile();
           setUser(profile);
         } catch (e) {
-          console.error('Error fetching user profile:', e);
-          setUser(null);
+          console.error('Error restoring session:', e);
+          // Fall back to cached user
+          const cached = getCachedUser();
+          setUser(cached);
         }
-      } else {
-        setUser(null);
       }
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    restoreSession();
   }, []);
 
   const login = async (email, password) => {
@@ -43,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await logoutUser();
+    logoutUser();
     setUser(null);
   };
 

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { language, switchLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -30,22 +32,34 @@ const Navbar = () => {
           {user?.role === 'mother' ? (
             <>
               <button className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => navigate('/dashboard')}>
-                🏠 Dashboard
+                🏠 {t('dashboard')}
               </button>
               <button className={`nav-link ${isActive('/health-form') ? 'active' : ''}`} onClick={() => navigate('/health-form')}>
-                📋 Health Assessment
+                📋 {t('healthAssessment')}
               </button>
               <button className={`nav-link ${isActive('/risk-result') ? 'active' : ''}`} onClick={() => navigate('/risk-result')}>
-                🤖 Risk Result
+                🤖 {t('riskResult')}
               </button>
             </>
           ) : (
             <>
               <button className={`nav-link ${isActive('/asha-dashboard') ? 'active' : ''}`} onClick={() => navigate('/asha-dashboard')}>
-                📊 Dashboard
+                📊 {t('dashboard')}
               </button>
             </>
           )}
+        </div>
+
+        {/* Language Switcher */}
+        <div className="lang-switcher">
+          <button
+            className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+            onClick={() => switchLanguage('en')}
+          >EN</button>
+          <button
+            className={`lang-btn ${language === 'kn' ? 'active' : ''}`}
+            onClick={() => switchLanguage('kn')}
+          >ಕನ್ನಡ</button>
         </div>
 
         {/* User Menu */}

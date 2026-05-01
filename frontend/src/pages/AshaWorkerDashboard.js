@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { db } from '../firebase/config';
-import { acknowledgeAlert } from '../firebase/firestoreService';
+import { getAshaDashboard, acknowledgeAlert } from '../services/dataService';
 import Navbar from '../components/Navbar';
 import './AshaWorkerDashboard.css';
 
@@ -22,47 +20,8 @@ const AshaWorkerDashboard = () => {
 
   const fetchDashboard = async () => {
     try {
-      // Read mothers directly from Firebase Firestore
-      const mothersSnap = await getDocs(collection(db, 'motherProfiles'));
-      const mothers = mothersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-      // Read pending alerts
-      let alerts = [];
-      try {
-        const alertsSnap = await getDocs(
-          query(collection(db, 'alerts'), where('status', '==', 'pending'))
-        );
-        alerts = alertsSnap.docs.map(doc => ({ _id: doc.id, id: doc.id, ...doc.data() }));
-      } catch (e) {
-        console.log('Alerts query needs index, skipping:', e.message);
-      }
-
-      const riskOrder = { high: 0, medium: 1, low: 2, unknown: 3 };
-      const patients = mothers
-        .map(m => ({
-          id: m.userId || m.id,
-          name: m.name || 'Unknown',
-          phone: m.phone || '',
-          village: m.village || '',
-          district: m.district || '',
-          riskLevel: m.currentRiskLevel || 'unknown',
-          currentTrimester: m.currentTrimester,
-          latestRiskScore: m.latestRiskScore,
-          urgency: m.urgency,
-          totalPredictions: m.totalPredictions || 0
-        }))
-        .sort((a, b) => (riskOrder[a.riskLevel] ?? 3) - (riskOrder[b.riskLevel] ?? 3));
-
-      const stats = {
-        total: patients.length,
-        highRisk: patients.filter(p => p.riskLevel === 'high').length,
-        mediumRisk: patients.filter(p => p.riskLevel === 'medium').length,
-        lowRisk: patients.filter(p => p.riskLevel === 'low').length,
-        pendingAlerts: alerts.length,
-        criticalAlerts: alerts.filter(a => a.severity === 'critical').length
-      };
-
-      setData({ patients, pendingAlerts: alerts, stats });
+      const dashData = await getAshaDashboard();
+      setData(dashData);
     } catch (err) {
       console.error('Dashboard fetch error:', err);
       setData({ patients: [], pendingAlerts: [], stats: { total: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0, pendingAlerts: 0, criticalAlerts: 0 } });
@@ -222,7 +181,7 @@ const AshaWorkerDashboard = () => {
             ) : (
               <div className="alerts-list">
                 {pendingAlerts.map((alert, i) => (
-                  <AlertCard key={alert._id || i} alert={alert} onAcknowledge={() => handleAcknowledgeAlert(alert._id)} />
+                  <AlertCard key={alert._id || alert.id || i} alert={alert} onAcknowledge={() => handleAcknowledgeAlert(alert._id || alert.id)} />
                 ))}
               </div>
             )}

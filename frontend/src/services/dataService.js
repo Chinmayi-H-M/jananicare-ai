@@ -1,37 +1,21 @@
 // ─────────────────────────────────────────────────────────
-// Firestore Service — Health Records, Predictions, Alerts
+// Data Service — Health Records, Predictions, Alerts (REST API)
 // ─────────────────────────────────────────────────────────
 
-import {
-  collection, doc, addDoc, setDoc, getDoc, getDocs,
-  query, where, orderBy, limit, updateDoc,
-  serverTimestamp, onSnapshot
-} from 'firebase/firestore';
-import { db } from './config';
+import api from './api';
 
 // ══════════════════════════════════════════════════════════
 // HEALTH RECORDS
 // ══════════════════════════════════════════════════════════
 
 export const saveHealthRecord = async (userId, healthData) => {
-  const record = {
-    ...healthData,
-    userId,
-    createdAt: serverTimestamp()
-  };
-  const docRef = await addDoc(collection(db, 'healthRecords'), record);
-  return { id: docRef.id, ...record };
+  const response = await api.post('/health-records', healthData);
+  return response.data;
 };
 
 export const getHealthRecords = async (userId) => {
-  const q = query(
-    collection(db, 'healthRecords'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(10)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  const response = await api.get('/health-records');
+  return response.data;
 };
 
 // ══════════════════════════════════════════════════════════
@@ -39,63 +23,18 @@ export const getHealthRecords = async (userId) => {
 // ══════════════════════════════════════════════════════════
 
 export const savePrediction = async (userId, predictionData) => {
-  const prediction = {
-    ...predictionData,
-    userId,
-    createdAt: serverTimestamp()
-  };
-  const docRef = await addDoc(collection(db, 'predictions'), prediction);
-
-  // Update mother profile with latest risk
-  await setDoc(doc(db, 'motherProfiles', userId), {
-    currentRiskLevel: predictionData.riskLevel,
-    lastPredictionDate: serverTimestamp(),
-    currentTrimester: predictionData.trimester || null,
-    totalPredictions: predictionData.totalPredictions || 1
-  }, { merge: true });
-
-  return { id: docRef.id, ...prediction };
+  const response = await api.post('/predictions', predictionData);
+  return response.data;
 };
 
 export const getLatestPrediction = async (userId) => {
-  const q = query(
-    collection(db, 'predictions'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(1)
-  );
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
-  const d = snapshot.docs[0];
-  return { id: d.id, ...d.data() };
+  const response = await api.get('/predictions/latest');
+  return response.data;
 };
 
 export const getAllPredictions = async (userId) => {
-  const q = query(
-    collection(db, 'predictions'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(10)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-};
-
-// ══════════════════════════════════════════════════════════
-// MOTHER PROFILE
-// ══════════════════════════════════════════════════════════
-
-export const getMotherProfile = async (userId) => {
-  const docSnap = await getDoc(doc(db, 'motherProfiles', userId));
-  if (!docSnap.exists()) return null;
-  return { id: docSnap.id, ...docSnap.data() };
-};
-
-export const updateMotherProfile = async (userId, updates) => {
-  await setDoc(doc(db, 'motherProfiles', userId), {
-    ...updates,
-    updatedAt: serverTimestamp()
-  }, { merge: true });
+  const response = await api.get('/predictions');
+  return response.data;
 };
 
 // ══════════════════════════════════════════════════════════
@@ -103,27 +42,8 @@ export const updateMotherProfile = async (userId, updates) => {
 // ══════════════════════════════════════════════════════════
 
 export const getMotherDashboard = async (userId) => {
-  const [profile, latestPrediction] = await Promise.all([
-    getMotherProfile(userId),
-    getLatestPrediction(userId)
-  ]);
-
-  const trimester = profile?.currentTrimester || 1;
-  const riskLevel = latestPrediction?.riskLevel || 'unknown';
-
-  return {
-    profile,
-    latestPrediction,
-    nextCheckup: profile?.nextCheckupDate?.toDate?.() || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    medicineReminders: profile?.medicineReminders || [
-      { medicine: 'Iron + Folic Acid Tablet', time: '08:00 AM', frequency: 'Daily' },
-      { medicine: 'Calcium Supplement', time: '02:00 PM', frequency: 'Daily' },
-      { medicine: 'Vitamin D', time: '08:00 AM', frequency: 'Weekly' }
-    ],
-    nutritionTips: getNutritionTips(trimester),
-    healthTips: getHealthTips(riskLevel),
-    emergencyContact: profile?.emergencyContact || null
-  };
+  const response = await api.get('/dashboard/mother');
+  return response.data;
 };
 
 // ══════════════════════════════════════════════════════════
@@ -131,68 +51,41 @@ export const getMotherDashboard = async (userId) => {
 // ══════════════════════════════════════════════════════════
 
 export const saveAlert = async (alertData) => {
-  const alert = {
-    ...alertData,
-    status: 'pending',
-    createdAt: serverTimestamp()
-  };
-  const docRef = await addDoc(collection(db, 'alerts'), alert);
-  return { id: docRef.id, ...alert };
+  const response = await api.post('/alerts', alertData);
+  return response.data;
 };
 
 export const acknowledgeAlert = async (alertId) => {
-  await updateDoc(doc(db, 'alerts', alertId), {
-    status: 'acknowledged',
-    acknowledgedAt: serverTimestamp()
-  });
+  const response = await api.put(`/alerts/${alertId}/acknowledge`);
+  return response.data;
 };
 
 export const getAlertsForMother = async (userId) => {
-  const q = query(
-    collection(db, 'alerts'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(20)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  const response = await api.get('/alerts');
+  return response.data;
 };
 
 // ══════════════════════════════════════════════════════════
-// ASHA WORKER — Get all mothers
+// ASHA WORKER — Dashboard & Patient Detail
 // ══════════════════════════════════════════════════════════
-
-export const getAllMothers = async () => {
-  const q = query(
-    collection(db, 'motherProfiles'),
-    orderBy('createdAt', 'desc')
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-};
 
 export const getAshaDashboard = async () => {
-  const mothers = await getAllMothers();
+  const [mothersRes, alertsRes] = await Promise.all([
+    api.get('/admin/mothers'),
+    api.get('/admin/alerts')
+  ]);
 
-  // Get pending alerts
-  const alertsQuery = query(
-    collection(db, 'alerts'),
-    where('status', '==', 'pending'),
-    orderBy('createdAt', 'desc'),
-    limit(20)
-  );
-  const alertsSnap = await getDocs(alertsQuery);
-  const pendingAlerts = alertsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const mothers = mothersRes.data.mothers || [];
+  const pendingAlerts = alertsRes.data.alerts || [];
 
-  // Build patient cards sorted by risk
   const riskOrder = { high: 0, medium: 1, low: 2, unknown: 3 };
   const patients = mothers
     .map(m => ({
-      id: m.userId || m.id,
-      name: m.name,
-      phone: m.phone,
-      village: m.village,
-      district: m.district,
+      id: m.userId || m.id || m._id,
+      name: m.name || 'Unknown',
+      phone: m.phone || '',
+      village: m.village || '',
+      district: m.district || '',
       riskLevel: m.currentRiskLevel || 'unknown',
       currentTrimester: m.currentTrimester,
       latestRiskScore: m.latestRiskScore,
@@ -214,38 +107,24 @@ export const getAshaDashboard = async () => {
 };
 
 export const getPatientDetail = async (userId) => {
-  const [profile, predictions, alerts] = await Promise.all([
-    getMotherProfile(userId),
-    getAllPredictions(userId),
-    getAlertsForMother(userId)
-  ]);
-
-  // Get user info
-  const userDoc = await getDoc(doc(db, 'users', userId));
-  const mother = userDoc.exists() ? { uid: userId, ...userDoc.data() } : null;
-
-  return { mother, profile, predictions, alerts, healthRecords: [] };
+  const response = await api.get(`/admin/patient/${userId}`);
+  return response.data;
 };
+
+// ══════════════════════════════════════════════════════════
+// VISIT LOGS
+// ══════════════════════════════════════════════════════════
 
 export const logVisit = async (visitData) => {
-  await addDoc(collection(db, 'visitLogs'), {
-    ...visitData,
-    createdAt: serverTimestamp()
-  });
-
-  // Update next checkup date on mother profile
-  if (visitData.motherId && visitData.nextVisitDate) {
-    await setDoc(doc(db, 'motherProfiles', visitData.motherId), {
-      nextCheckupDate: new Date(visitData.nextVisitDate)
-    }, { merge: true });
-  }
+  const response = await api.post('/visits', visitData);
+  return response.data;
 };
 
 // ══════════════════════════════════════════════════════════
-// HELPERS
+// HELPERS (kept client-side — no DB needed)
 // ══════════════════════════════════════════════════════════
 
-function getNutritionTips(trimester) {
+export function getNutritionTips(trimester) {
   const tips = {
     1: [
       { icon: '🥬', title: 'Folic Acid Foods', desc: 'Eat spinach, lentils, and fortified cereals daily' },
@@ -269,7 +148,7 @@ function getNutritionTips(trimester) {
   return tips[trimester] || tips[1];
 }
 
-function getHealthTips(riskLevel) {
+export function getHealthTips(riskLevel) {
   const tips = {
     low: ['Continue regular antenatal checkups every 4 weeks', 'Practice light prenatal yoga or walking 30 min daily', 'Get 8 hours of sleep, sleep on your left side', 'Avoid stress - practice deep breathing exercises'],
     medium: ['Schedule doctor visit within 2-3 days', 'Monitor blood pressure daily if possible', 'Avoid heavy lifting and strenuous activities', 'Keep emergency contacts readily available'],

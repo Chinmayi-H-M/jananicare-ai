@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import './AuthPages.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { language, switchLanguage, t } = useLanguage();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,16 +26,9 @@ const LoginPage = () => {
       navigate(user.role === 'asha_worker' ? '/asha-dashboard' : '/dashboard');
     } catch (err) {
       console.error('Login error:', err);
-      const errorMessages = {
-        'auth/user-not-found': 'No account found with this email. Please register first.',
-        'auth/wrong-password': 'Incorrect password. Please try again.',
-        'auth/invalid-email': 'Please enter a valid email address.',
-        'auth/invalid-credential': 'Invalid email or password. Please try again.',
-        'auth/user-disabled': 'This account has been disabled.',
-        'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
-        'auth/network-request-failed': 'Network error. Check your internet connection.'
-      };
-      setError(errorMessages[err.code] || err.message || 'Login failed. Please check your credentials.');
+      // Handle API error responses
+      const errorMessage = err.response?.data?.error || err.message || 'Login failed. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -52,8 +47,8 @@ const LoginPage = () => {
       <div className="auth-left">
         <div className="auth-brand">
           <span className="brand-icon">🌸</span>
-          <h1>JananiCare AI</h1>
-          <p>Predict Early. Protect Mothers.</p>
+          <h1>{t('brandName')}</h1>
+          <p>{t('tagline')}</p>
         </div>
         <div className="auth-illustration">
           <div className="illustration-card">
@@ -77,8 +72,12 @@ const LoginPage = () => {
       <div className="auth-right">
         <div className="auth-form-container">
           <div className="auth-form-header">
-            <h2>Welcome Back</h2>
-            <p>Sign in to your JananiCare AI account</p>
+            <div className="auth-lang-switcher">
+              <button className={`lang-btn ${language === 'en' ? 'active' : ''}`} onClick={() => switchLanguage('en')}>EN</button>
+              <button className={`lang-btn ${language === 'kn' ? 'active' : ''}`} onClick={() => switchLanguage('kn')}>ಕನ್ನಡ</button>
+            </div>
+            <h2>{t('welcomeBack')}</h2>
+            <p>{t('signIn')} — JananiCare AI</p>
           </div>
 
           {/* Demo Buttons */}
@@ -102,7 +101,7 @@ const LoginPage = () => {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label>Email Address</label>
+              <label>{t('email')}</label>
               <input
                 type="email"
                 name="email"
@@ -115,7 +114,7 @@ const LoginPage = () => {
             </div>
 
             <div className="form-group">
-              <label>Password</label>
+              <label>{t('password')}</label>
               <input
                 type="password"
                 name="password"
@@ -131,17 +130,17 @@ const LoginPage = () => {
               {loading ? (
                 <><span className="btn-spinner"></span> Signing in...</>
               ) : (
-                'Sign In →'
+                `${t('signIn')} →`
               )}
             </button>
           </form>
 
           <p className="auth-switch">
-            Don't have an account? <Link to="/register">Create Account</Link>
+            {t('noAccount')} <Link to="/register">{t('createAccount')}</Link>
           </p>
 
           <div className="auth-back">
-            <Link to="/">← Back to Home</Link>
+            <Link to="/">← {t('backToHome')}</Link>
           </div>
         </div>
       </div>

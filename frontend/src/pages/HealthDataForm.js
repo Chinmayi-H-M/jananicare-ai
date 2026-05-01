@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { saveHealthRecord, savePrediction } from '../firebase/firestoreService';
+import { saveHealthRecord, savePrediction } from '../services/dataService';
 import Navbar from '../components/Navbar';
 import './HealthDataForm.css';
 
@@ -146,7 +146,7 @@ const HealthDataForm = () => {
         notes: formData.notes
       };
 
-      // Save health record to Firestore
+      // Save health record to database
       await saveHealthRecord(user.uid, payload);
 
       // Call AI prediction via backend proxy
@@ -163,7 +163,7 @@ const HealthDataForm = () => {
         predictionResult = simulatePrediction(formData);
       }
 
-      // Save prediction to Firestore
+      // Save prediction to database
       await savePrediction(user.uid, {
         ...predictionResult,
         trimester: payload.trimester

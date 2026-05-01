@@ -315,5 +315,5 @@ def batch_predict():
 
 
 if __name__ == '__main__':
-    print('🤖 JananiCare AI Prediction API starting on port 5001...')
+    print('JananiCare AI Prediction API starting on port 5001...')
     app.run(host='0.0.0.0', port=5001, debug=True)

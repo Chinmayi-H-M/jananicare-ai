@@ -63,6 +63,34 @@
 .nav-link:hover { background: #f1f5f9; color: #1e293b; }
 .nav-link.active { background: #eff6ff; color: #2563eb; }
 
+/* Language Switcher */
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+.lang-btn {
+  padding: 5px 10px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.lang-btn.active {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 1px 4px rgba(37,99,235,0.3);
+}
+
 /* User Menu */
 .navbar-user { position: relative; margin-left: auto; }
 

@@ -1,0 +1,166 @@
+export const translations = {
+  en: {
+    // Navbar
+    dashboard: 'Dashboard', healthAssessment: 'Health Assessment', riskResult: 'Risk Result',
+    signOut: 'Sign Out', newAssessment: 'New Assessment', mother: 'Mother', ashaWorker: 'ASHA Worker',
+    // Landing
+    brandName: 'JananiCare AI', tagline: 'Predict Early. Protect Mothers.',
+    heroTitle: 'AI-Powered Maternal Healthcare', heroDesc: 'Protecting mothers through early risk detection',
+    getStarted: 'Get Started', learnMore: 'Learn More',
+    // Auth
+    welcomeBack: 'Welcome Back', signIn: 'Sign In', createAccount: 'Create Account',
+    email: 'Email Address', password: 'Password', fullName: 'Full Name',
+    confirmPassword: 'Confirm Password', phone: 'Phone Number', village: 'Village / Town',
+    district: 'District', state: 'State', nextStep: 'Next Step',
+    alreadyAccount: 'Already have an account?', noAccount: "Don't have an account?",
+    pregnantMother: 'Pregnant Mother', backToHome: 'Back to Home',
+    // Mother Dashboard
+    hello: 'Hello', healthOverview: "Here's your pregnancy health overview for today",
+    oneTapHelp: 'One Tap Emergency Help', sendHelpNow: 'SEND HELP NOW',
+    alertASHA: 'Instantly alert your ASHA worker and nearest PHC',
+    emergencyAlertSent: 'Emergency Alert Sent!',
+    helpOnWay: 'Your ASHA worker and nearest PHC have been notified. Help is on the way!',
+    pregnancyRisk: 'Pregnancy Risk Status', basedOnAssessment: 'Based on your latest health assessment',
+    riskScore: 'Risk Score', noAssessmentYet: 'No risk assessment yet',
+    startAssessment: 'Start Health Assessment', updateHealthData: 'Update Health Data',
+    nextCheckup: 'Next Checkup', daysRemaining: 'days remaining', antenatalVisit: 'Antenatal Visit',
+    pregnancyStage: 'Pregnancy Stage', trimester: 'Trimester', notSet: 'Not set',
+    // Risk levels
+    highRisk: 'HIGH RISK', mediumRisk: 'MEDIUM RISK', lowRisk: 'LOW RISK', unknownRisk: 'UNKNOWN',
+    seekImmediate: 'Seek immediate medical attention',
+    scheduleDoctorVisit: 'Schedule doctor visit within 2-3 days',
+    continueCheckups: 'Continue regular antenatal checkups',
+    // Medicine
+    medicineReminders: 'Medicine & Supplement Reminders', today: 'Today',
+    // Nutrition
+    nutritionGuidance: 'Nutrition Guidance', general: 'General',
+    // Health Tips
+    healthTips: 'Personalized Health Tips',
+    // Emergency
+    emergencyContacts: 'Emergency Contacts', nationalAmbulance: 'National Ambulance',
+    womenHelpline: 'Women Helpline', emergencyServices: 'Emergency Services', call: 'Call',
+    // CTA
+    readyAssessment: 'Ready for your AI Risk Assessment?',
+    enterHealthData: 'Enter your latest health data to get an updated risk prediction',
+    // Health Form
+    healthDataAssessment: 'Health Data Assessment',
+    enterHealthInfo: 'Enter your health information for AI-powered risk prediction',
+    basicInfo: 'Basic Information', vitals: 'Health Vitals', symptoms: 'Symptoms',
+    review: 'Review', age: 'Age (years)', weight: 'Weight (kg)', height: 'Height (cm)',
+    pregnancyTrimester: 'Pregnancy Trimester', weeksPregnant: 'Weeks Pregnant',
+    previousPregnancies: 'Previous Pregnancies', previousComplications: 'Had complications in previous pregnancies',
+    hemoglobin: 'Hemoglobin (g/dL)', bloodPressureSys: 'Blood Pressure — Systolic',
+    bloodPressureDia: 'Blood Pressure — Diastolic', bloodSugar: 'Blood Sugar (mg/dL)',
+    selectSymptoms: 'Select all symptoms you are currently experiencing',
+    voiceInput: 'Voice Symptom Input', startSpeaking: 'Start Speaking', stopRecording: 'Stop Recording',
+    reviewSubmit: 'Review & Submit', reviewInfo: 'Please review your information before submitting',
+    getAIPrediction: 'Get AI Risk Prediction', analyzing: 'Analyzing with AI...',
+    previous: 'Previous',
+    // ASHA Dashboard
+    ashaDashboard: 'ASHA Worker Dashboard', welcomeBack2: 'Welcome back',
+    totalPatients: 'Total Patients', pendingAlerts: 'Pending Alerts', criticalAlerts: 'Critical Alerts',
+    patientMonitoring: 'Patient Monitoring', priorityAlerts: 'Priority Alerts',
+    searchPatients: 'Search by name or village...', all: 'All', viewDetails: 'View Details',
+    priorityCase: 'PRIORITY CASE — Immediate attention required',
+    noPatients: 'No patients found matching your criteria',
+    noPendingAlerts: 'No pending alerts — all patients are being monitored',
+    acknowledgeAlert: 'Acknowledge Alert', assessments: 'Assessments', urgency: 'Urgency',
+    // Patient Detail
+    backToDashboard: 'Back to Dashboard', pregnancyInfo: 'Pregnancy Information',
+    currentTrimester: 'Current Trimester', expectedDelivery: 'Expected Delivery',
+    bloodGroup: 'Blood Group', totalAssessments: 'Total Assessments',
+    lastAssessment: 'Last Assessment', nextCheckupDate: 'Next Checkup',
+    latestAIPrediction: 'Latest AI Prediction', riskFactors: 'Risk Factors',
+    assessmentHistory: 'Assessment History', date: 'Date', riskLevel: 'Risk Level',
+    score: 'Score', doctorRequired: 'Doctor Required',
+    alertHistory: 'Alert History', logVisit: 'Log Visit / Follow-up',
+    visitNotes: 'Visit Notes', nextVisitDate: 'Next Visit Date', visitStatus: 'Visit Status',
+    normalVisit: 'Normal Visit', followUpNeeded: 'Follow-up Needed',
+    referredDoctor: 'Referred to Doctor', emergencyReferral: 'Emergency Referral',
+    saving: 'Saving...', logVisitBtn: 'Log Visit', callPatient: 'Call Patient',
+    // Language
+    language: 'Language', english: 'English', kannada: 'ಕನ್ನಡ'
+  },
+  kn: {
+    // Navbar
+    dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', healthAssessment: 'ಆರೋಗ್ಯ ಮೌಲ್ಯಮಾಪನ', riskResult: 'ಅಪಾಯ ಫಲಿತಾಂಶ',
+    signOut: 'ಸೈನ್ ಔಟ್', newAssessment: 'ಹೊಸ ಮೌಲ್ಯಮಾಪನ', mother: 'ತಾಯಿ', ashaWorker: 'ಆಶಾ ಕಾರ್ಯಕರ್ತೆ',
+    // Landing
+    brandName: 'ಜನನಿಕೇರ್ AI', tagline: 'ಮುಂಚಿತವಾಗಿ ಊಹಿಸಿ. ತಾಯಂದಿರನ್ನು ರಕ್ಷಿಸಿ.',
+    heroTitle: 'AI-ಆಧಾರಿತ ತಾಯಿ ಆರೋಗ್ಯ ಸೇವೆ', heroDesc: 'ಮುಂಚಿತ ಅಪಾಯ ಪತ್ತೆ ಮೂಲಕ ತಾಯಂದಿರನ್ನು ರಕ್ಷಿಸುವುದು',
+    getStarted: 'ಪ್ರಾರಂಭಿಸಿ', learnMore: 'ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ',
+    // Auth
+    welcomeBack: 'ಮರಳಿ ಸ್ವಾಗತ', signIn: 'ಸೈನ್ ಇನ್', createAccount: 'ಖಾತೆ ರಚಿಸಿ',
+    email: 'ಇಮೇಲ್ ವಿಳಾಸ', password: 'ಗುಪ್ತಪದ', fullName: 'ಪೂರ್ಣ ಹೆಸರು',
+    confirmPassword: 'ಗುಪ್ತಪದ ದೃಢೀಕರಿಸಿ', phone: 'ಫೋನ್ ಸಂಖ್ಯೆ', village: 'ಹಳ್ಳಿ / ಪಟ್ಟಣ',
+    district: 'ಜಿಲ್ಲೆ', state: 'ರಾಜ್ಯ', nextStep: 'ಮುಂದಿನ ಹಂತ',
+    alreadyAccount: 'ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?', noAccount: 'ಖಾತೆ ಇಲ್ಲವೇ?',
+    pregnantMother: 'ಗರ್ಭಿಣಿ ತಾಯಿ', backToHome: 'ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ',
+    // Mother Dashboard
+    hello: 'ನಮಸ್ಕಾರ', healthOverview: 'ಇಂದಿನ ನಿಮ್ಮ ಗರ್ಭಧಾರಣೆ ಆರೋಗ್ಯ ಸಾರಾಂಶ',
+    oneTapHelp: 'ಒಂದೇ ಟ್ಯಾಪ್ ತುರ್ತು ಸಹಾಯ', sendHelpNow: 'ಈಗ ಸಹಾಯ ಕಳುಹಿಸಿ',
+    alertASHA: 'ನಿಮ್ಮ ಆಶಾ ಕಾರ್ಯಕರ್ತೆ ಮತ್ತು ಹತ್ತಿರದ PHC ಗೆ ತಕ್ಷಣ ಎಚ್ಚರಿಕೆ ನೀಡಿ',
+    emergencyAlertSent: 'ತುರ್ತು ಎಚ್ಚರಿಕೆ ಕಳುಹಿಸಲಾಗಿದೆ!',
+    helpOnWay: 'ನಿಮ್ಮ ಆಶಾ ಕಾರ್ಯಕರ್ತೆ ಮತ್ತು ಹತ್ತಿರದ PHC ಗೆ ತಿಳಿಸಲಾಗಿದೆ. ಸಹಾಯ ಬರುತ್ತಿದೆ!',
+    pregnancyRisk: 'ಗರ್ಭಧಾರಣೆ ಅಪಾಯ ಸ್ಥಿತಿ', basedOnAssessment: 'ನಿಮ್ಮ ಇತ್ತೀಚಿನ ಆರೋಗ್ಯ ಮೌಲ್ಯಮಾಪನದ ಆಧಾರದ ಮೇಲೆ',
+    riskScore: 'ಅಪಾಯ ಅಂಕ', noAssessmentYet: 'ಇನ್ನೂ ಅಪಾಯ ಮೌಲ್ಯಮಾಪನ ಮಾಡಿಲ್ಲ',
+    startAssessment: 'ಆರೋಗ್ಯ ಮೌಲ್ಯಮಾಪನ ಪ್ರಾರಂಭಿಸಿ', updateHealthData: 'ಆರೋಗ್ಯ ಮಾಹಿತಿ ನವೀಕರಿಸಿ',
+    nextCheckup: 'ಮುಂದಿನ ತಪಾಸಣೆ', daysRemaining: 'ದಿನಗಳು ಬಾಕಿ', antenatalVisit: 'ಗರ್ಭಪೂರ್ವ ಭೇಟಿ',
+    pregnancyStage: 'ಗರ್ಭಧಾರಣೆ ಹಂತ', trimester: 'ತ್ರೈಮಾಸಿಕ', notSet: 'ಹೊಂದಿಸಿಲ್ಲ',
+    // Risk levels
+    highRisk: 'ಹೆಚ್ಚಿನ ಅಪಾಯ', mediumRisk: 'ಮಧ್ಯಮ ಅಪಾಯ', lowRisk: 'ಕಡಿಮೆ ಅಪಾಯ', unknownRisk: 'ಅಜ್ಞಾತ',
+    seekImmediate: 'ತಕ್ಷಣ ವೈದ್ಯಕೀಯ ಸಹಾಯ ಪಡೆಯಿರಿ',
+    scheduleDoctorVisit: '2-3 ದಿನಗಳಲ್ಲಿ ವೈದ್ಯರ ಭೇಟಿ ನಿಗದಿಪಡಿಸಿ',
+    continueCheckups: 'ನಿಯಮಿತ ಗರ್ಭಪೂರ್ವ ತಪಾಸಣೆ ಮುಂದುವರಿಸಿ',
+    // Medicine
+    medicineReminders: 'ಔಷಧಿ ಮತ್ತು ಪೂರಕ ಜ್ಞಾಪನೆಗಳು', today: 'ಇಂದು',
+    // Nutrition
+    nutritionGuidance: 'ಪೋಷಣೆ ಮಾರ್ಗದರ್ಶನ', general: 'ಸಾಮಾನ್ಯ',
+    // Health Tips
+    healthTips: 'ವೈಯಕ್ತಿಕ ಆರೋಗ್ಯ ಸಲಹೆಗಳು',
+    // Emergency
+    emergencyContacts: 'ತುರ್ತು ಸಂಪರ್ಕಗಳು', nationalAmbulance: 'ರಾಷ್ಟ್ರೀಯ ಆಂಬ್ಯುಲೆನ್ಸ್',
+    womenHelpline: 'ಮಹಿಳಾ ಸಹಾಯವಾಣಿ', emergencyServices: 'ತುರ್ತು ಸೇವೆಗಳು', call: 'ಕರೆ',
+    // CTA
+    readyAssessment: 'ನಿಮ್ಮ AI ಅಪಾಯ ಮೌಲ್ಯಮಾಪನಕ್ಕೆ ಸಿದ್ಧರೇ?',
+    enterHealthData: 'ನವೀಕರಿಸಿದ ಅಪಾಯ ಮುನ್ಸೂಚನೆ ಪಡೆಯಲು ನಿಮ್ಮ ಇತ್ತೀಚಿನ ಆರೋಗ್ಯ ಮಾಹಿತಿ ನಮೂದಿಸಿ',
+    // Health Form
+    healthDataAssessment: 'ಆರೋಗ್ಯ ಮಾಹಿತಿ ಮೌಲ್ಯಮಾಪನ',
+    enterHealthInfo: 'AI-ಆಧಾರಿತ ಅಪಾಯ ಮುನ್ಸೂಚನೆಗಾಗಿ ನಿಮ್ಮ ಆರೋಗ್ಯ ಮಾಹಿತಿ ನಮೂದಿಸಿ',
+    basicInfo: 'ಮೂಲ ಮಾಹಿತಿ', vitals: 'ಆರೋಗ್ಯ ಮಾಪನಗಳು', symptoms: 'ರೋಗಲಕ್ಷಣಗಳು',
+    review: 'ಪರಿಶೀಲನೆ', age: 'ವಯಸ್ಸು (ವರ್ಷಗಳು)', weight: 'ತೂಕ (ಕೆಜಿ)', height: 'ಎತ್ತರ (ಸೆಂ.ಮೀ.)',
+    pregnancyTrimester: 'ಗರ್ಭಧಾರಣೆ ತ್ರೈಮಾಸಿಕ', weeksPregnant: 'ಗರ್ಭಧಾರಣೆ ವಾರಗಳು',
+    previousPregnancies: 'ಹಿಂದಿನ ಗರ್ಭಧಾರಣೆಗಳು', previousComplications: 'ಹಿಂದಿನ ಗರ್ಭಧಾರಣೆಯಲ್ಲಿ ತೊಂದರೆಗಳಿದ್ದವು',
+    hemoglobin: 'ಹಿಮೋಗ್ಲೋಬಿನ್ (g/dL)', bloodPressureSys: 'ರಕ್ತದೊತ್ತಡ — ಸಿಸ್ಟೋಲಿಕ್',
+    bloodPressureDia: 'ರಕ್ತದೊತ್ತಡ — ಡಯಾಸ್ಟೋಲಿಕ್', bloodSugar: 'ರಕ್ತದ ಸಕ್ಕರೆ (mg/dL)',
+    selectSymptoms: 'ನೀವು ಪ್ರಸ್ತುತ ಅನುಭವಿಸುತ್ತಿರುವ ಎಲ್ಲಾ ರೋಗಲಕ್ಷಣಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+    voiceInput: 'ಧ್ವನಿ ರೋಗಲಕ್ಷಣ ಇನ್‌ಪುಟ್', startSpeaking: 'ಮಾತನಾಡಲು ಪ್ರಾರಂಭಿಸಿ', stopRecording: 'ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ',
+    reviewSubmit: 'ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಸಲ್ಲಿಸಿ', reviewInfo: 'ಸಲ್ಲಿಸುವ ಮೊದಲು ನಿಮ್ಮ ಮಾಹಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ',
+    getAIPrediction: 'AI ಅಪಾಯ ಮುನ್ಸೂಚನೆ ಪಡೆಯಿರಿ', analyzing: 'AI ನೊಂದಿಗೆ ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...',
+    previous: 'ಹಿಂದಿನ',
+    // ASHA Dashboard
+    ashaDashboard: 'ಆಶಾ ಕಾರ್ಯಕರ್ತೆ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', welcomeBack2: 'ಮರಳಿ ಸ್ವಾಗತ',
+    totalPatients: 'ಒಟ್ಟು ರೋಗಿಗಳು', pendingAlerts: 'ಬಾಕಿ ಎಚ್ಚರಿಕೆಗಳು', criticalAlerts: 'ನಿರ್ಣಾಯಕ ಎಚ್ಚರಿಕೆಗಳು',
+    patientMonitoring: 'ರೋಗಿ ಮೇಲ್ವಿಚಾರಣೆ', priorityAlerts: 'ಆದ್ಯತೆ ಎಚ್ಚರಿಕೆಗಳು',
+    searchPatients: 'ಹೆಸರು ಅಥವಾ ಹಳ್ಳಿಯ ಮೂಲಕ ಹುಡುಕಿ...', all: 'ಎಲ್ಲಾ', viewDetails: 'ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ',
+    priorityCase: 'ಆದ್ಯತೆ ಪ್ರಕರಣ — ತಕ್ಷಣ ಗಮನ ಅಗತ್ಯ',
+    noPatients: 'ನಿಮ್ಮ ಮಾನದಂಡಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವ ರೋಗಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ',
+    noPendingAlerts: 'ಬಾಕಿ ಎಚ್ಚರಿಕೆಗಳಿಲ್ಲ — ಎಲ್ಲಾ ರೋಗಿಗಳನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಲಾಗುತ್ತಿದೆ',
+    acknowledgeAlert: 'ಎಚ್ಚರಿಕೆ ಸ್ವೀಕರಿಸಿ', assessments: 'ಮೌಲ್ಯಮಾಪನಗಳು', urgency: 'ತುರ್ತು',
+    // Patient Detail
+    backToDashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ', pregnancyInfo: 'ಗರ್ಭಧಾರಣೆ ಮಾಹಿತಿ',
+    currentTrimester: 'ಪ್ರಸ್ತುತ ತ್ರೈಮಾಸಿಕ', expectedDelivery: 'ನಿರೀಕ್ಷಿತ ಹೆರಿಗೆ',
+    bloodGroup: 'ರಕ್ತದ ಗುಂಪು', totalAssessments: 'ಒಟ್ಟು ಮೌಲ್ಯಮಾಪನಗಳು',
+    lastAssessment: 'ಕೊನೆಯ ಮೌಲ್ಯಮಾಪನ', nextCheckupDate: 'ಮುಂದಿನ ತಪಾಸಣೆ',
+    latestAIPrediction: 'ಇತ್ತೀಚಿನ AI ಮುನ್ಸೂಚನೆ', riskFactors: 'ಅಪಾಯ ಅಂಶಗಳು',
+    assessmentHistory: 'ಮೌಲ್ಯಮಾಪನ ಇತಿಹಾಸ', date: 'ದಿನಾಂಕ', riskLevel: 'ಅಪಾಯ ಮಟ್ಟ',
+    score: 'ಅಂಕ', doctorRequired: 'ವೈದ್ಯರ ಅಗತ್ಯವಿದೆ',
+    alertHistory: 'ಎಚ್ಚರಿಕೆ ಇತಿಹಾಸ', logVisit: 'ಭೇಟಿ / ಅನುಸರಣೆ ದಾಖಲಿಸಿ',
+    visitNotes: 'ಭೇಟಿ ಟಿಪ್ಪಣಿಗಳು', nextVisitDate: 'ಮುಂದಿನ ಭೇಟಿ ದಿನಾಂಕ', visitStatus: 'ಭೇಟಿ ಸ್ಥಿತಿ',
+    normalVisit: 'ಸಾಮಾನ್ಯ ಭೇಟಿ', followUpNeeded: 'ಅನುಸರಣೆ ಅಗತ್ಯ',
+    referredDoctor: 'ವೈದ್ಯರಿಗೆ ಉಲ್ಲೇಖಿಸಲಾಗಿದೆ', emergencyReferral: 'ತುರ್ತು ಉಲ್ಲೇಖ',
+    saving: 'ಉಳಿಸಲಾಗುತ್ತಿದೆ...', logVisitBtn: 'ಭೇಟಿ ದಾಖಲಿಸಿ', callPatient: 'ರೋಗಿಗೆ ಕರೆ ಮಾಡಿ',
+    // Language
+    language: 'ಭಾಷೆ', english: 'English', kannada: 'ಕನ್ನಡ'
+  }
+};
