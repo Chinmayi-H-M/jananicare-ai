@@ -9,7 +9,7 @@ import { startAlarm, stopAlarm, initAudio } from "../services/alarm";
 
 
 
-const HOSPITAL_CACHE_KEY = 'jananicare_nearby_hospitals';
+const HOSPITAL_CACHE_KEY = 'jananicare_nearby_hospitals_v5';
 const CACHE_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 const AshaWorkerDashboard = () => {
@@ -28,6 +28,8 @@ const AshaWorkerDashboard = () => {
   const [hospitalsFetched, setHospitalsFetched] = useState(false);
   const [isFromCache, setIsFromCache] = useState(false);
   const [lastCacheTime, setLastCacheTime] = useState(null);
+  const [fallbackMode, setFallbackMode] = useState(false);
+  const [searchTargetId, setSearchTargetId] = useState('worker');
 
   useEffect(() => {
     fetchDashboard();
@@ -118,9 +120,10 @@ const AshaWorkerDashboard = () => {
     try {
       const cached = localStorage.getItem(HOSPITAL_CACHE_KEY);
       if (cached) {
-        const { hospitals: cachedList, timestamp } = JSON.parse(cached);
+        const { hospitals: cachedList, timestamp, fallback } = JSON.parse(cached);
         if (Date.now() - timestamp < CACHE_EXPIRY_MS) {
           setHospitals(cachedList);
+          setFallbackMode(fallback || false);
           setIsFromCache(true);
           setLastCacheTime(new Date(timestamp));
           setHospitalsFetched(true);
@@ -137,7 +140,7 @@ const AshaWorkerDashboard = () => {
     setLocationError(null);
     setIsFromCache(false);
     try {
-      const query = `[out:json][timeout:15];(node["amenity"="hospital"](around:25000,${lat},${lng});node["amenity"="clinic"](around:25000,${lat},${lng});node["amenity"="doctors"](around:25000,${lat},${lng});way["amenity"="hospital"](around:25000,${lat},${lng});node["healthcare:speciality"~"maternity|gynaecology|obstetrics"](around:25000,${lat},${lng}););out center body;`;
+      const query = `[out:json][timeout:15];(node["amenity"="hospital"](around:10000,${lat},${lng});node["amenity"="clinic"](around:10000,${lat},${lng});node["amenity"="doctors"](around:10000,${lat},${lng});way["amenity"="hospital"](around:10000,${lat},${lng});node["healthcare:speciality"~"maternity|gynaecology|obstetrics"](around:10000,${lat},${lng}););out center body;`;
       const resp = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
       if (!resp.ok) throw new Error('API request failed');
       const json = await resp.json();
@@ -145,7 +148,7 @@ const AshaWorkerDashboard = () => {
       // Maternity-related keywords (English + Indian terms)
       const maternityKeywords = ['maternity', 'maternal', 'nursing home', 'women', 'woman', 'gynec', 'obstet', 'pregnan', 'janani', 'prasuti', 'mahila', 'stri', 'lady', 'mother', 'child', 'phc', 'primary health', 'health cent', 'sub cent', 'anganwadi', 'delivery', 'neonatal', 'pediatr', 'paediatr'];
 
-      const results = (json.elements || []).map(el => {
+      let allResults = (json.elements || []).map(el => {
         const elLat = el.lat || el.center?.lat;
         const elLon = el.lon || el.center?.lon;
         const dist = elLat && elLon ? calcDistance(lat, lng, elLat, elLon) : null;
@@ -157,9 +160,6 @@ const AshaWorkerDashboard = () => {
         const isMaternityByName = maternityKeywords.some(kw => name.includes(kw));
         const isMaternityByTag = speciality.includes('maternity') || speciality.includes('gynaecology') || speciality.includes('obstetrics');
         const isPHC = name.includes('phc') || name.includes('primary health') || name.includes('health cent') || name.includes('sub cent');
-
-        // Only include maternity-related facilities and PHCs
-        if (!isMaternityByName && !isMaternityByTag && !isPHC) return null;
 
         let type = 'Hospital';
         if (amenity === 'clinic') type = 'Clinic';
@@ -179,15 +179,29 @@ const AshaWorkerDashboard = () => {
           phone: el.tags?.phone || el.tags?.['contact:phone'] || '',
           emergency: el.tags?.emergency === 'yes',
           website: el.tags?.website || '',
-          openingHours: el.tags?.opening_hours || ''
+          openingHours: el.tags?.opening_hours || '',
+          isMaternity: isMaternityByName || isMaternityByTag || isPHC
         };
-      }).filter(h => h && h.lat && h.lon).sort((a, b) => (a.distance || 999) - (b.distance || 999));
+      }).filter(h => h && h.lat && h.lon);
+
+      // Filter to only maternity hospitals and PHCs
+      let results = allResults.filter(h => h.isMaternity);
+      let isFallback = false;
+
+      // Fallback: If no maternity clinics found, show all hospitals
+      if (results.length === 0 && allResults.length > 0) {
+        results = allResults;
+        isFallback = true;
+      }
+      
+      results.sort((a, b) => (a.distance || 999) - (b.distance || 999));
 
       setHospitals(results);
+      setFallbackMode(isFallback);
       setHospitalsFetched(true);
 
       // Cache results
-      localStorage.setItem(HOSPITAL_CACHE_KEY, JSON.stringify({ hospitals: results, timestamp: Date.now() }));
+      localStorage.setItem(HOSPITAL_CACHE_KEY, JSON.stringify({ hospitals: results, timestamp: Date.now(), fallback: isFallback }));
       setLastCacheTime(new Date());
     } catch (err) {
       console.error('Overpass API error:', err);
@@ -201,28 +215,68 @@ const AshaWorkerDashboard = () => {
   }, [loadCachedHospitals]);
 
   // ── Request geolocation ──
-  const requestLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setLocationError('unsupported');
-      return;
-    }
+  const requestLocation = useCallback(async (targetId = searchTargetId) => {
     setHospitalsLoading(true);
     setLocationError(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        fetchNearbyHospitals(loc.lat, loc.lng);
-      },
-      (err) => {
-        console.error('Geolocation error:', err);
-        setHospitalsLoading(false);
-        if (!loadCachedHospitals()) {
-          setLocationError('denied');
+
+    let searchTarget = null;
+    let isWorker = targetId === 'worker';
+    
+    if (isWorker) {
+      searchTarget = { village: user?.village || user?.assignedArea, district: user?.district };
+    } else {
+      const p = (data?.patients || []).find(p => (p.id || p._id) === targetId);
+      if (p) {
+        searchTarget = { village: p.village, district: p.district };
+      }
+    }
+
+    // 1. Try to geocode the selected target's area/village first
+    if (searchTarget && (searchTarget.village || searchTarget.district)) {
+      const parts = [searchTarget.village, searchTarget.district, 'Karnataka', 'India'].filter(Boolean);
+      const query = parts.join(', ');
+      try {
+        // Adding a user agent or email is recommended by Nominatim, but this is a simple demo app.
+        const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.length > 0) {
+            fetchNearbyHospitals(parseFloat(data[0].lat), parseFloat(data[0].lon));
+            return;
+          }
         }
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
-    );
-  }, [fetchNearbyHospitals, loadCachedHospitals]);
+      } catch (err) {
+        console.error('Geocoding error:', err);
+      }
+    }
+
+    // 2. Fallback to browser geolocation (only if looking for worker location)
+    if (isWorker) {
+      if (!navigator.geolocation) {
+        setHospitalsLoading(false);
+        setLocationError('unsupported');
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          fetchNearbyHospitals(loc.lat, loc.lng);
+        },
+        (err) => {
+          console.error('Geolocation error:', err);
+          setHospitalsLoading(false);
+          if (!loadCachedHospitals()) {
+            setLocationError('denied');
+          }
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+      );
+    } else {
+      setHospitalsLoading(false);
+      setLocationError('patient_not_found'); // Show error if patient geocoding failed
+    }
+  }, [fetchNearbyHospitals, loadCachedHospitals, user, data, searchTargetId]);
 
   // ── When hospital tab is selected ──
   useEffect(() => {
@@ -410,10 +464,30 @@ const AshaWorkerDashboard = () => {
         {activeTab === 'hospitals' && (
           <div className="hospitals-section fade-in">
             {/* Header bar */}
-            <div className="hospitals-header">
+            <div className="hospitals-header" style={{ flexWrap: 'wrap' }}>
               <div className="hospitals-header-info">
                 <h2>🤰 Maternity Hospitals & PHCs</h2>
-                <span className="hospitals-radius-badge">📍 25 km radius</span>
+                <span className="hospitals-radius-badge">📍 10 km radius</span>
+                
+                <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <label style={{ fontSize: '14px', color: '#64748b', fontWeight: '500' }}>Search Near:</label>
+                  <select 
+                    value={searchTargetId} 
+                    onChange={(e) => {
+                      setSearchTargetId(e.target.value);
+                      setHospitalsFetched(false);
+                      requestLocation(e.target.value);
+                    }}
+                    style={{ padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', backgroundColor: '#fff', outline: 'none', cursor: 'pointer', flex: 1, minWidth: '200px' }}
+                  >
+                    <option value="worker">🙋‍♀️ My Location ({user?.village || 'Current'})</option>
+                    <optgroup label="My Patients">
+                      {(data?.patients || []).map(p => (
+                        <option key={p.id || p._id} value={p.id || p._id}>👤 {p.name} ({p.village})</option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </div>
               </div>
               <div className="hospitals-header-actions">
                 {isFromCache && lastCacheTime && (
@@ -498,10 +572,15 @@ const AshaWorkerDashboard = () => {
                 {hospitals.length === 0 ? (
                   <div className="empty-state">
                     <span>🏥</span>
-                    <p>No hospitals found within 25 km</p>
+                    <p>No hospitals found within 10 km</p>
                   </div>
                 ) : (
                   <>
+                    {fallbackMode && (
+                      <div style={{ background: '#fffbeb', color: '#b45309', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #fde68a', fontSize: '14px' }}>
+                        ⚠️ <strong>No specialized maternity clinics found nearby.</strong> We are displaying general hospitals and healthcare facilities as a fallback. Please verify with them if they handle maternity cases.
+                      </div>
+                    )}
                     <p className="hospitals-count">{hospitals.length} healthcare facilities found</p>
                     <div className="hospitals-grid">
                       {hospitals.map((hospital, i) => (
