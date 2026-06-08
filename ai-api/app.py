@@ -1,4 +1,15 @@
-─────────────────────────────────
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from datetime import datetime
+import os
+
+app = Flask(__name__)
+CORS(app)
+
+# ─────────────────────────────────────────────
+# Rule-based + weighted ML-style prediction
+# In production, replace with a trained sklearn model
+# ─────────────────────────────────────────────
 
 SYMPTOM_WEIGHTS = {
     'bleeding': 20,
